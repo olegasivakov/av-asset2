@@ -1,8 +1,8 @@
 # av-asset2
 AV asset contract based on ERC721A
 
-3) (**owner**) Deploy Asset contract for CAT, and
-4) (**owner**) Deploy Asset contract for ROBOT
+3) (**owner**) Deploy Asset contract for CAT. Set contract parameters before deployment as it desctibed at set2.
+4) (**owner**) Deploy Asset contract for ROBOT. Set contract parameters before deployment as it desctibed at set2.
 
 --> see set2
 
