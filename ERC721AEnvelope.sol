@@ -69,6 +69,7 @@ abstract contract ERC721AEnvelope is Array, Context, ERC721AToken {
 
         (address[] memory addrs,uint256[] memory tokens) = _envelopeAssets(_envelopeId);
         _burn(_envelopeId);
+        _transferEnvelope(_owner,_envelopeId);
         unchecked {
             for(uint i = 0; i < addrs.length; i++) {
                 _unlockEnvelopeAsset(

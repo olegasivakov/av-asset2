@@ -304,7 +304,7 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
      * Transfer set and all its assets
      */
     function _transferEnvelope(address _to,uint256 _assetId)
-    private
+    internal
     {
         unchecked {
             for (uint i = 0; i < _envelopeTypes.types.length; i++) {
@@ -351,10 +351,12 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         if (to == address(0))
             revert TransferToZeroAddress();
 
+        /*
         if(
             sender == prevOwnership.addr &&
             _contractData.isEnvelope
         ) _transferEnvelope(to,tokenId);
+        */
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId, prevOwnership.addr);
@@ -483,51 +485,4 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         }
     }
 
-    /**
-     * @dev Hook that is called before a set of serially-ordered token ids are about to be transferred. This includes minting.
-     * And also called before burning one token.
-     *
-     * startTokenId - the first token id to be transferred
-     * quantity - the amount to be transferred
-     *
-     * Calling conditions:
-     *
-     * - When `from` and `to` are both non-zero, `from`'s `tokenId` will be
-     * transferred to `to`.
-     * - When `from` is zero, `tokenId` will be minted for `to`.
-     * - When `to` is zero, `tokenId` will be burned by `from`.
-     * - `from` and `to` are never both zero.
-     */
-    function _beforeTokenTransfers(
-        address/* from*/,
-        address to,
-        uint256 startTokenId,
-        uint256/* quantity*/
-    ) internal virtual {
-        if(address(0) != to)
-            _transferEnvelope(to,startTokenId);
-    }
-
-    /**
-     * @dev Hook that is called after a set of serially-ordered token ids have been transferred. This includes
-     * minting.
-     * And also called after one token has been burned.
-     *
-     * startTokenId - the first token id to be transferred
-     * quantity - the amount to be transferred
-     *
-     * Calling conditions:
-     *
-     * - When `from` and `to` are both non-zero, `from`'s `tokenId` has been
-     * transferred to `to`.
-     * - When `from` is zero, `tokenId` has been minted for `to`.
-     * - When `to` is zero, `tokenId` has been burned by `from`.
-     * - `from` and `to` are never both zero.
-     */
-    function _afterTokenTransfers(
-        address from,
-        address to,
-        uint256 startTokenId,
-        uint256 quantity
-    ) internal virtual {}
 }

@@ -5,8 +5,6 @@ pragma solidity ^0.8.4;
 
 contract TokenStorage {
 
-    address Whitelist = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
-
     enum MintStatus {
         NONE,
         PRESALE,

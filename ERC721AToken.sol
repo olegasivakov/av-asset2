@@ -73,6 +73,13 @@ abstract contract ERC721AToken is Context, Ownership, ERC721A {
         }
     }
 
+    function decimals()
+    external pure
+    returns(uint8)
+    {
+        return 0;
+    }
+
     /**
      * @dev Burns `tokenId`. See {ERC721A-_burn}.
      *

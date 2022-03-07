@@ -50,7 +50,13 @@ contract AccessControl is Ownership {
             _addressData[sender].whitelisted == true ||
             _contractData.mintStatus == MintStatus.SALE
         ;
-        if(!flag) flag = IWhitelist(Whitelist).check(sender);
+
+        /**
+         * Add as many whitelists as you need
+         */
+        if(!flag) flag = IWhitelist(0x2622bBEc5940849997cF50eA644C86ff57E4c94b).check(sender);
+
+        /**/
         if(!flag)
             revert WhitelistedOnly();
     }
