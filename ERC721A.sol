@@ -16,8 +16,6 @@ import './Quantity.sol';
 import './Strings.sol';
 import './AccessControl.sol';
 
-//import "hardhat/console.sol";
-
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
  * the Metadata extension. Built to optimize for lower gas during batch mints.
