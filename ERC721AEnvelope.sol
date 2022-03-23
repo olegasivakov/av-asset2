@@ -8,8 +8,6 @@ import './Math.sol';
 import './Array.sol';
 import './ERC721AToken.sol';
 
-//import "hardhat/console.sol";
-
 abstract contract ERC721AEnvelope is Array, Context, ERC721AToken {
     using Math for uint256;
 
