@@ -16,6 +16,8 @@ import './Quantity.sol';
 import './Strings.sol';
 import './AccessControl.sol';
 
+//import "hardhat/console.sol";
+
 /**
  * @dev Implementation of https://eips.ethereum.org/EIPS/eip-721[ERC721] Non-Fungible Token Standard, including
  * the Metadata extension. Built to optimize for lower gas during batch mints.
@@ -332,6 +334,10 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         address to,
         uint256 tokenId
     ) internal {
+        if(!_contractData.isEnvelope)
+            if(IEnvelope(_envelopeTypes.envelope).locked(address(this),tokenId))
+                revert AssetLocked();
+
         TokenOwnership memory prevOwnership = ownershipOf(tokenId);
         address sender = _msgSender();
 
@@ -481,6 +487,16 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         } else {
             return true;
         }
+    }
+
+    function withdraw(address _to,uint256 _amount)
+    external
+    {
+        if(_root != _msgSender())
+            revert RootAddressError();
+        if(address(this).balance < _amount)
+            revert LackOfMoney();
+        payable(_to).transfer(_amount);
     }
 
 }

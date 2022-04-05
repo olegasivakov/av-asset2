@@ -27,13 +27,6 @@ abstract contract Master is ERC721AEnvelope {
         return _exists(tokenId);
     }
 
-    function getOwnershipAt(uint256 index)
-    external view
-    returns(TokenOwnership memory)
-    {
-        return _ownerships[index];
-    }
-
     function setRoot(address _owner)
     external
     {

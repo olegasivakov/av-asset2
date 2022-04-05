@@ -19,8 +19,6 @@ contract TokenStorage {
         uint64 startTimestamp;
         // Whether the token has been burned.
         bool burned;
-        // Custom token URL6 if specified
-        string url;
     }
 
     // Compiler will pack this into a single 256bit word.

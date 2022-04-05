@@ -64,12 +64,15 @@ abstract contract ERC721AToken is Context, Ownership, ERC721A {
 
         if (!_contractData.isRevealed) {
             return _contractData.baseURL;
-        } else if (_contractData.isRevealed && _contractData.isEnvelope) {
-            return ownershipOf(tokenId).url;
         } else if (!_contractData.isEnvelope && _assetsEnveloped[address(this)][tokenId]) {
             return Strings.concat(_contractData.baseURL, "/locked.json");
         } else {
-            return Strings.concat(_contractData.baseURL, Strings.toString(tokenId));
+            return string(
+                abi.encodePacked(
+                    _contractData.baseURL,
+                    Strings.toString(tokenId),
+                    ".json"
+                ));
         }
     }
 
@@ -90,6 +93,10 @@ abstract contract ERC721AToken is Context, Ownership, ERC721A {
     function burn(uint256 tokenId)
     internal
     {
+        if(!_contractData.isEnvelope)
+            if(IEnvelope(_envelopeTypes.envelope).locked(address(this),tokenId))
+                revert AssetLocked();
+                
         TokenOwnership memory prevOwnership = ownershipOf(tokenId);
 
         bool isApprovedOrOwner = (_msgSender() == prevOwnership.addr ||

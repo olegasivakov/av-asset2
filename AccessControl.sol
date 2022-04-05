@@ -3,6 +3,7 @@
 
 pragma solidity ^0.8.4;
 
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import './Ownership.sol';
 import './IWhitelist.sol';
 
@@ -41,7 +42,7 @@ contract AccessControl is Ownership {
         ) revert RootAddressError();
     }
 
-    function Whitelisted()
+    function Whitelisted(bytes32[] calldata _merkleProof)
     internal view
     {
         address sender = _msgSender();
@@ -52,9 +53,17 @@ contract AccessControl is Ownership {
         ;
 
         /**
+         * Set merkle tree root
+         */
+        if(!flag) {
+            bytes32 root = 0xd4bc4f2113da59daf4b69a528a42e8046a24d50ae9304af37f5ccd8ee632e88b;
+            flag = MerkleProof.verify(_merkleProof, root, keccak256(abi.encodePacked(sender)));
+        }
+
+        /**
          * Add as many whitelists as you need
          */
-        if(!flag) flag = IWhitelist(0x2622bBEc5940849997cF50eA644C86ff57E4c94b).check(sender);
+        //if(!flag) flag = IWhitelist(0x2622bBEc5940849997cF50eA644C86ff57E4c94b).check(sender);
 
         /**/
         if(!flag)

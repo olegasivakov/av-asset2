@@ -6,6 +6,7 @@ pragma solidity ^0.8.4;
 import '@openzeppelin/contracts/utils/Context.sol';
 
 import './Errors.sol';
+import './IEnvelope.sol';
 import './TokenStorage.sol';
 
 contract Ownership is Context, TokenStorage {
@@ -42,6 +43,40 @@ contract Ownership is Context, TokenStorage {
             }
         }
         revert OwnerQueryForNonexistentToken();
+    }
+
+    mapping(uint256 => bool) private tokens_;
+
+    function tokensOf(address _owner)
+    external
+    returns(uint256[] memory)
+    {
+        unchecked {
+            uint n = 0;
+            for(uint i=0;i<_currentIndex;i++) {
+                tokens_[i] = false;
+                TokenOwnership memory ownership = ownershipOf(i);
+                if(ownership.addr == _owner) {
+                    if (!ownership.burned) {
+                        if(_contractData.isEnvelope) {
+                            n++;
+                            tokens_[i] = true;
+                        } else {
+                            if(!IEnvelope(_envelopeTypes.envelope).locked(address(this),i)) {
+                                n++;
+                                tokens_[i] = true;
+                            }
+                        }
+                    }
+                }
+            }
+            uint256[] memory tokens = new uint256[](n);
+            n = 0;
+            for(uint i=0;i<_currentIndex;i++)
+                if(tokens_[i])
+                    tokens[n++] = i;
+            return tokens;
+        }
     }
 
 }
