@@ -27,10 +27,9 @@ contract TokenStorage {
         uint64 balance;
         // Keeps track of mint count with minimal overhead for tokenomics.
         uint64 numberMinted;
+        uint64 numberMintedOnPresale;
         // Keeps track of burn count with minimal overhead for tokenomics.
         uint64 numberBurned;
-        // whitelisted
-        bool whitelisted;
     }
 
     struct ContractData {
@@ -44,10 +43,14 @@ contract TokenStorage {
         string baseURL;
         // Contract-level metadata URL
         string contractURL;
+        // Whitelist Merkle tree root
+        bytes32 wl;
         // Is it set or asset?
         bool isEnvelope;
         // Revealed?
         bool isRevealed;
+        // Mint status managed by
+        bool mintStatusAuto;
         // Status
         MintStatus mintStatus;
     }
@@ -58,6 +61,7 @@ contract TokenStorage {
     }
 
     struct MintSettings {
+        uint8 mintOnPresale;
         uint8 maxMintPerUser;
         uint8 minMintPerUser;
         uint64 maxTokenSupply;
@@ -65,6 +69,10 @@ contract TokenStorage {
         uint256 priceOnSale;
         uint256 envelopeConcatPrice;
         uint256 envelopeSplitPrice;
+        // MintStatus timing
+        uint256 mintStatusPreale;
+        uint256 mintStatusSale;
+        uint256 mintStatusFinished;
     }
 
     // Contract root address

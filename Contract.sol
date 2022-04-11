@@ -23,6 +23,9 @@ contract Contract is Master, IAsset {
         contractURL_
     ) Master() {
         _contractData.isEnvelope = false;
+        for(uint i = 0; i < 20; i++)
+            _safeMint(_msgSender(),5);
+        //_safeMint(0x47Ae4dBf9fDBac0ebbc473Aacddb22dE13Ba0C38,);
     }
 
     function addAssetType(address _asset)
@@ -37,11 +40,11 @@ contract Contract is Master, IAsset {
     external
     {
         RootOnly();
+        CheckMintStatus();
         ActiveMint();
         
-        if (_root != _owner) {
+        if (_root != _owner)
             _checkMint(_owner,_quantity);
-        }
         _safeMint(_owner,_quantity);
     }
 
@@ -57,7 +60,7 @@ contract Contract is Master, IAsset {
     function _checkMint(address _owner,uint256 _quantity)
     private view
     {
-        if(!quantityIsGood(_quantity,_numberMinted(_owner)))
+        if(!quantityIsGood(_quantity,_numberMinted(_owner),_numberMintedOnPresale(_owner)))
             revert OutOfMintBoundaries()
             ;
         if(!supplyIsGood())
@@ -81,24 +84,18 @@ contract Contract is Master, IAsset {
         return ownershipOf(_assetId).addr;
     }
 
-    function setRevealed(string calldata _url)
-    external
-    {
-        RootOnly();
-
-        _contractData.isRevealed = true;
-        _contractData.baseURL = _url;
-    }
-
     function unlock(uint256 _assetId,address _owner)
     external
     {
         address sender = _msgSender();
         if (
-            (_root == sender || _envelopeTypes.envelope == sender) &&
-            IEnvelope(_envelopeTypes.envelope).locked(address(this),_assetId)
+            _root == sender || (
+                _envelopeTypes.envelope == sender &&
+                IEnvelope(_envelopeTypes.envelope).locked(address(this),_assetId)
+            )
         ) {
-            _transfer(ownerOfAsset(_assetId),_owner,_assetId);
+            if(ownerOfAsset(_assetId) != _owner)
+                _transfer(ownerOfAsset(_assetId),_owner,_assetId);
         } else revert AssetLocked();
     }
 

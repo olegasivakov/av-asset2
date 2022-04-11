@@ -13,17 +13,6 @@ import './ERC721AToken.sol';
 abstract contract ERC721AEnvelope is Array, Context, ERC721AToken {
     using Math for uint256;
 
-    function _mintSetOfAssets(uint256 _quantity)
-    internal
-    {
-        unchecked {
-            for (uint i = 0; i < _envelopeTypes.types.length; i++) {
-                if(_mintSettings.maxMintPerUser < IAsset(_envelopeTypes.types[i]).checkMint(_msgSender(),_quantity))
-                    revert OutOfMintBoundaries();
-            }
-        }
-    }
-
     function _mintSetOfAssets(address _owner,uint _quantity)
     internal
     {

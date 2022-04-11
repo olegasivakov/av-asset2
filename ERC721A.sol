@@ -100,6 +100,16 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
             uint256(_addressData[owner].numberMinted);
     }
 
+    function _numberMintedOnPresale(address owner)
+    internal view
+    returns(uint256)
+    {
+        if (owner == address(0))
+            revert MintedQueryForZeroAddress();
+        else return
+            uint256(_addressData[owner].numberMintedOnPresale);
+    }
+
     /**
      * returnsthe number of tokens burned by or on behalf of `owner`.
      */
@@ -190,6 +200,10 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         address to,
         uint256 tokenId
     ) public virtual override {
+        if(!_contractData.isEnvelope)
+            if(IEnvelope(_envelopeTypes.envelope).locked(address(this),tokenId))
+                revert AssetLocked();
+                
         _transfer(from, to, tokenId);
     }
 
@@ -213,6 +227,10 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         uint256 tokenId,
         bytes memory _data
     ) public virtual override {
+        if(!_contractData.isEnvelope)
+            if(IEnvelope(_envelopeTypes.envelope).locked(address(this),tokenId))
+                revert AssetLocked();
+
         _transfer(from, to, tokenId);
         if (!_checkOnERC721Received(from, to, tokenId, _data))
             revert TransferToNonERC721ReceiverImplementer();
@@ -284,6 +302,8 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         unchecked {
             _addressData[to].balance += uint64(quantity);
             _addressData[to].numberMinted += uint64(quantity);
+            if(_contractData.mintStatus == MintStatus.PRESALE)
+                _addressData[to].numberMintedOnPresale = _addressData[to].numberMintedOnPresale + uint64(quantity);
 
             _ownerships[startTokenId].addr = to;
             _ownerships[startTokenId].startTimestamp = uint64(block.timestamp);
@@ -334,9 +354,6 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         address to,
         uint256 tokenId
     ) internal {
-        if(!_contractData.isEnvelope)
-            if(IEnvelope(_envelopeTypes.envelope).locked(address(this),tokenId))
-                revert AssetLocked();
 
         TokenOwnership memory prevOwnership = ownershipOf(tokenId);
         address sender = _msgSender();
@@ -487,6 +504,15 @@ abstract contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, AccessCo
         } else {
             return true;
         }
+    }
+
+    function getBalance()
+    external view
+    returns(uint256)
+    {
+        if(_root != _msgSender())
+            revert RootAddressError();
+        return address(this).balance;
     }
 
     function withdraw(address _to,uint256 _amount)

@@ -62,18 +62,13 @@ abstract contract ERC721AToken is Context, Ownership, ERC721A {
         if (!_exists(tokenId))
             revert URIQueryForNonexistentToken();
 
-        if (!_contractData.isRevealed) {
-            return _contractData.baseURL;
-        } else if (!_contractData.isEnvelope && _assetsEnveloped[address(this)][tokenId]) {
-            return Strings.concat(_contractData.baseURL, "/locked.json");
-        } else {
-            return string(
+        return string(
                 abi.encodePacked(
                     _contractData.baseURL,
+                    "/",
                     Strings.toString(tokenId),
                     ".json"
                 ));
-        }
     }
 
     function decimals()
@@ -107,30 +102,6 @@ abstract contract ERC721AToken is Context, Ownership, ERC721A {
             revert TransferCallerNotOwnerNorApproved();
 
         _burn(tokenId);
-    }
-
-    function setMintingIsOnPresale()
-    external
-    {
-        RootOnly();
-
-        _contractData.mintStatus = MintStatus.PRESALE;
-    }
-    
-    function setMintingIsOnSale()
-    external
-    {
-        RootOnly();
-
-        _contractData.mintStatus = MintStatus.SALE;
-    }
-     
-    function stopMinting()
-    external
-    {
-        RootOnly();
-
-        _contractData.mintStatus = MintStatus.NONE;
     }
 
 }

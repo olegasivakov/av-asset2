@@ -11,13 +11,18 @@ abstract contract Master is ERC721AEnvelope {
         _root = _msgSender();
         _contractData.isRevealed = false;
         _contractData.mintStatus = MintStatus.NONE;
-        _mintSettings.maxMintPerUser = 5;
-        _mintSettings.minMintPerUser = 1;
-        _mintSettings.maxTokenSupply = 10000;
-        _mintSettings.priceOnPresale = 0;
-        _mintSettings.priceOnSale = 0;
-        _mintSettings.envelopeConcatPrice = 0;
-        _mintSettings.envelopeSplitPrice = 0;
+        _contractData.mintStatusAuto = true;
+        _mintSettings.mintOnPresale = 1; // number of tokens on presale
+        _mintSettings.maxMintPerUser = 2; // max tokens on sale
+        _mintSettings.minMintPerUser = 1; // min tokens on sale
+        _mintSettings.maxTokenSupply = 5000;
+        _mintSettings.priceOnPresale = 37500000000000000; // in wei, may be changed later
+        _mintSettings.priceOnSale = 47500000000000000; // in wei, may be changed later
+        _mintSettings.envelopeConcatPrice = 0; // in wei, may be changed later
+        _mintSettings.envelopeSplitPrice = 0; // in wei, may be changed later
+        _mintSettings.mintStatusPreale = 1649683800; //  Monday, April 11, 2022 2:00:00 PM GMT
+        _mintSettings.mintStatusSale = 1649728800; //  Tuesday, April 12, 2022 2:00:00 AM GMT
+        _mintSettings.mintStatusFinished = 0; //does not specified
     }
 
     function exists(uint256 tokenId)
@@ -42,6 +47,56 @@ abstract contract Master is ERC721AEnvelope {
         return _root;
     }
 
+    function CheckMintStatus()
+    internal
+    {
+        if(!_contractData.mintStatusAuto)
+            return;
+        
+        uint256 mps = _mintSettings.mintStatusPreale - 86400;
+        uint256 ms = _mintSettings.mintStatusSale;
+        uint256 mf = _mintSettings.mintStatusFinished;
+        if (mps <= block.timestamp && block.timestamp < ms) {
+            _contractData.mintStatus = MintStatus.PRESALE;
+        } else if (ms <= block.timestamp && (block.timestamp < mf || 0 == mf)) {
+            _contractData.mintStatus = MintStatus.SALE;
+        } else {
+            _contractData.mintStatus = MintStatus.NONE;
+        }
+    }
+
+    function toggleMintStatus(bool _mode)
+    external
+    {
+        RootOnly();
+
+        _contractData.mintStatusAuto = _mode;
+    }
+
+    function setMintingIsOnPresale()
+    external
+    {
+        RootOnly();
+
+        _contractData.mintStatus = MintStatus.PRESALE;
+    }
+    
+    function setMintingIsOnSale()
+    external
+    {
+        RootOnly();
+
+        _contractData.mintStatus = MintStatus.SALE;
+    }
+     
+    function stopMinting()
+    external
+    {
+        RootOnly();
+
+        _contractData.mintStatus = MintStatus.NONE;
+    }
+
     function updateContract(
         uint256 _pricePresale,
         uint256 _priceSale,
@@ -58,6 +113,15 @@ abstract contract Master is ERC721AEnvelope {
         _mintSettings.maxMintPerUser = _maxMint;
         _mintSettings.minMintPerUser = _minMint;
         _mintSettings.maxTokenSupply = _maxSupply;
+    }
+
+    function setRevealed(string calldata _url)
+    external
+    {
+        RootOnly();
+
+        _contractData.isRevealed = true;
+        _contractData.baseURL = _url;
     }
 
     function updateBaseURL(string calldata _url)
